@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title> Star Catcher </title>
+
+        <style>
+            body {
+                background-color: #17172e;
+                color: white;
+                font-family: Arial, sans-serif;
+                text-align: center;
+            }
+
+            h1 {
+                color: #ffd166;
+            }
+
+            canvas {
+                background: #25254a;
+                border: 3px solid #ffd166;
+                border-radius: 10px;
+            }
+
+            button {
+                padding: 10px 20px;
+                margin: 10px;
+                background: #ffd166;
+                border: none;
+                border-radius: 6px;
+                font-size: 16px;
+                cursor: pointer;
+            }
+        </style>
+    </head>
+
+    <body>
+        <h1> Star Catcher</h1>
+        <p> Use WASD or Arrow Keys to move! </p>
+        <h2>Score: <span id = "score">0</span></h2>
+        <h3 id="message">Press Start Game! </h3>
+
+        <canvas id="game" width="500" height="500"></canvas>
+
+        <br><br>
+
+        <button onclick="startGame()">Start Game</button>
+
+        <script>
+
+            const canvas = document.getElementById("game");
+            const ctx = canvas.getContext("2d");
+
+            let basket = {
+                x: 210,
+                y: 455,
+                width: 80,
+                height: 20,
+                speed: 7
+            };
+
+            let star = {
+                x: 100,
+                y: 0,
+                size: 24,
+                speed: 3,
+            };
+
+            let score = 0;
+            let playing = false;
+
+            let keys = {};
+            
+            // Keyboard Controls
+            document.addEventListener("keydown", function(e) {if (["arrowLeft", "arrowright", "arrowup", "arrowdown"].includes(e.key.toLowerCase())) {
+                    e.preventDefault();
+                }
+            });
+
+            document.addEventListener("keyup", function(e) {
+                keys[e.key.toLowerCase()] = false;
+            });
+
+            window.addEventListener("blur", function() {
+                keys = {};
+            });
+
+            //Start Game
+            function startGame() {
+                score = 0;
+
+                basket.x = 210;
+
+                star.x = Math.random() * 470;
+                star.y = 0;
+                star.speed = 3;
+
+                keys= {};
+                playing = true;
+
+                document.getElementById("score").textContent = score;
+                document.getElementById("message").textContent = "Catch the stars!";
+
+                updateGame();
+
+            }
+
+            //Draw Game Objects
+            function drawGame() {
+
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                //Background stars
+                ctx.fillStyle = "white";
+                ctx.font = "20px Arial";
+                ctx.fillText("⭐", 50, 100);
+                ctx.fillText("⭐", 400, 150);
+                ctx.fillText("⭐", 300, 70);
+
+                //Basket
+                ctx.fillStyle = "#06d6a0";
+
+                ctx.fillRect(
+                    basket.x,
+                    basket.y,
+                    basket.width,
+                    basket.height
+                );
+
+                //Falling Star
+                ctx.font = "28px Arial";
+                ctx.fillText("⭐", star.x, star.y, star.size);
+            }
+
+            //Game loop
+            function updateGame() {
+
+                if (!playing) return;
+
+                //Move left with A or left arrow
+                if (keys["a"]|| keys["arrowleft"]) {
+                    basket.x -= basket.speed;
+                }
+
+                //Move right with D or right arrow
+                if (keys["d"] || keys["arrowright"]) {
+                    basket.x += basket.speed;
+                }
+
+                //Keep basket within canvas
+                basket.x = Math.max(
+                    0,
+                    Math.min(420, basket.x)
+                );
+                //Make star fall
+                star.y += star.speed;
+
+                //Check for collision
+                if ( 
+                    star.y + star.size >= basket.y &&
+                    star.y <= basket.y + basket.height &&
+                    star.x + star.size >= basket.x &&
+                    star.x <= basket.x + basket.width
+            ) {
+
+                score++;
+
+                document.getElementById("score").textContent = score;
+
+                star.y = 0;
+                star.x = Math.random() * 470;
+
+                star.speed += 0.2;
+            }
+
+            //Game over
+            if (star.y > canvas.height) {
+                
+                playing = false;
+
+                document.getElementById("message").textContent = "Game Over! Final Score: " + score + ". Press Start Game to play again!";
+
+                drawGame();
+                
+                return;
+            }
+
+            drawGame();
+
+            requestAnimationFrame(updateGame);
+            }
+        </script>
+    </body>
