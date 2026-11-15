@@ -55,7 +55,7 @@
                 y: 455,
                 width: 80,
                 height: 20,
-                speed: 7
+                speed: 5
             };
 
             let star = {
@@ -71,7 +71,11 @@
             let keys = {};
             
             // Keyboard Controls
-            document.addEventListener("keydown", function(e) {if (["arrowLeft", "arrowright", "arrowup", "arrowdown"].includes(e.key.toLowerCase())) {
+            document.addEventListener("keydown", function(e) {
+                const key = e.key.toLowerCase();
+                keys[key] = true;
+
+                if (["arrowleft", "arrowright", "arrowup", "arrowdown"].includes(key)) {
                     e.preventDefault();
                 }
             });
